@@ -1,82 +1,134 @@
-// =============================================================================
-// PROGRAMMING FUNDAMENTALS — Assignment 7
-// =============================================================================
-//
-// TASK: Console-Based To-Do List Application
-//
-// Build a simple to-do list program that runs entirely in the console and
-// allows the user to manage their tasks interactively using a menu.
-//
-// -----------------------------------------------------------------------------
-// FEATURES YOUR PROGRAM MUST SUPPORT
-// -----------------------------------------------------------------------------
-//
-//   1. Add a Task
-//      - Prompt the user to type a task description.
-//      - Add it to the list and confirm it was added.
-//
-//   2. View All Tasks
-//      - Display all tasks currently in the list, numbered from 1.
-//      - If the list is empty, print a friendly message saying so.
-//
-//   3. Delete a Task
-//      - Show the list of tasks with their numbers.
-//      - Ask the user which task number they want to remove.
-//      - Remove the task and confirm the deletion.
-//      - If the task number is invalid, print an error message.
-//
-//   4. Quit
-//      - End the program with a farewell message.
-//
-// -----------------------------------------------------------------------------
-// HOW THE MENU SHOULD LOOK
-// -----------------------------------------------------------------------------
-//
-//   ============================
-//        TO-DO LIST MENU
-//   ============================
-//   1. Add task
-//   2. View tasks
-//   3. Delete task
-//   4. Quit
-//   Enter your choice (1-4):
-//
-// -----------------------------------------------------------------------------
-// EXPECTED INTERACTION EXAMPLE
-// -----------------------------------------------------------------------------
-//
-//   Enter your choice (1-4): 1
-//   Enter task: Buy groceries
-//   Task added: "Buy groceries"
-//
-//   Enter your choice (1-4): 2
-//   Your Tasks:
-//   1. Buy groceries
-//   2. Study for exams
-//
-//   Enter your choice (1-4): 3
-//   Enter task number to delete: 1
-//   Task "Buy groceries" has been removed.
-//
-//   Enter your choice (1-4): 4
-//   Goodbye!
-//
-// -----------------------------------------------------------------------------
-// REQUIREMENTS
-// -----------------------------------------------------------------------------
-// - Store tasks in a vector<string> (a dynamic list of text).
-// - Use a loop to keep the menu running until the user chooses to quit.
-// - Each feature MUST be implemented in its own function (see scaffold below).
-// - Handle invalid menu choices gracefully (print an error, do not crash).
-//
-
-//
-// =============================================================================
-// YOUR CODE BELOW — remove the // symbols from the scaffold and fill it in
-// =============================================================================
-
 #include <iostream>
-#include <vector>
 #include <string>
 using namespace std;
 
+// global variables - very beginner style
+string tasks[100];
+bool status[100]; // false = not done, true = done
+int taskCount = 0;
+
+// function prototypes
+void addTask();
+void viewTasks();
+void deleteTask();
+void markDone();
+
+int main() {
+    int choice;
+
+    do {
+        // menu
+        cout << "\n===== TO-DO LIST =====" << endl;
+        cout << "1. Add Task" << endl;
+        cout << "2. View All Tasks" << endl;
+        cout << "3. Mark Task as Done" << endl;
+        cout << "4. Delete Task" << endl;
+        cout << "5. Exit" << endl;
+        cout << "Enter choice: ";
+        cin >> choice;
+        cin.ignore(); // clear buffer for getline
+
+        if (choice == 1) {
+            addTask();
+        }
+        else if (choice == 2) {
+            viewTasks();
+        }
+        else if (choice == 3) {
+            markDone();
+        }
+        else if (choice == 4) {
+            deleteTask();
+        }
+        else if (choice == 5) {
+            cout << "Goodbye!" << endl;
+        }
+        else {
+            cout << "Invalid choice" << endl;
+        }
+
+    } while (choice!= 5);
+
+    return 0;
+}
+
+// PART 1: Add a task
+void addTask() {
+    if (taskCount >= 100) {
+        cout << "Task list is full!" << endl;
+        return;
+    }
+
+    string task;
+    cout << "Enter task description: ";
+    getline(cin, task);
+
+    tasks[taskCount] = task;
+    status[taskCount] = false; // not done yet
+    taskCount++;
+
+    cout << "Task added successfully!" << endl;
+}
+
+// PART 2: View all tasks
+void viewTasks() {
+    if (taskCount == 0) {
+        cout << "No tasks in the list." << endl;
+        return;
+    }
+
+    cout << "\n--- Your Tasks ---" << endl;
+    for (int i = 0; i < taskCount; i++) {
+        cout << i + 1 << ". " << tasks[i];
+        if (status[i] == true) {
+            cout << " [DONE]" << endl;
+        } else {
+            cout << " [PENDING]" << endl;
+        }
+    }
+}
+
+// PART 3: Mark task as done
+void markDone() {
+    if (taskCount == 0) {
+        cout << "No tasks to mark." << endl;
+        return;
+    }
+
+    viewTasks();
+    int num;
+    cout << "Enter task number to mark as done: ";
+    cin >> num;
+
+    if (num >= 1 && num <= taskCount) {
+        status[num - 1] = true;
+        cout << "Task marked as done!" << endl;
+    } else {
+        cout << "Invalid task number" << endl;
+    }
+}
+
+// PART 4: Delete task
+void deleteTask() {
+    if (taskCount == 0) {
+        cout << "No tasks to delete." << endl;
+        return;
+    }
+
+    viewTasks();
+    int num;
+    cout << "Enter task number to delete: ";
+    cin >> num;
+
+    if (num >= 1 && num <= taskCount) {
+        // shift tasks down
+        for (int i = num - 1; i < taskCount - 1; i++) {
+            tasks[i] = tasks[i + 1];
+            status[i] = status[i + 1];
+        }
+        taskCount--;
+        cout << "Task deleted!" << endl;
+    } else {
+        cout << "Invalid task number" << endl;
+    }
+}
